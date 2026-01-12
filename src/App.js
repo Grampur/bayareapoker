@@ -24,7 +24,7 @@ const ChartCard = ({ title, src, height }) => (
         src={src}
         title={title}
         style={{
-          width: "900px",   // 👈 forces readable chart size
+          width: "900px",
           height: height,
           border: "none",
           background: "white",
@@ -35,7 +35,7 @@ const ChartCard = ({ title, src, height }) => (
       />
     </div>
 
-    {/* Optional mobile hint */}
+    {/*mobile hint */}
     <div
       style={{
         fontSize: "0.8rem",
@@ -105,12 +105,12 @@ const TableCard = ({ title, data }) => {
 
 export default function App() {
   const profitData = [
-    { Name: "Gagan R.", "Total Profit": 20, "Sessions Played": 1 },
-    { Name: "Sean S.", "Total Profit": 30, "Sessions Played": 1 },
+    { Name: "Gagan R.", "Total Profit": 61, "Sessions Played": 2 },
+    { Name: "Sean S.", "Total Profit": 68, "Sessions Played": 2 },
     { Name: "Troy H.", "Total Profit": 80, "Sessions Played": 1 },
-    { Name: "Ethan T.", "Total Profit": -40, "Sessions Played": 1 },
-    { Name: "Avery T.", "Total Profit": -50, "Sessions Played": 1 },
-    { Name: "Ethan L.", "Total Profit": -40, "Sessions Played": 1 },
+    { Name: "Ethan T.", "Total Profit": -91, "Sessions Played": 2 },
+    { Name: "Avery T.", "Total Profit": -66, "Sessions Played": 2 },
+    { Name: "Ethan L.", "Total Profit": -52, "Sessions Played": 2 },
   ];
 
 
