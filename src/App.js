@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ChartCard = ({ title, src, height }) => (
   <div
@@ -12,8 +13,6 @@ const ChartCard = ({ title, src, height }) => (
     }}
   >
     <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
-
-    {/* Scroll container */}
     <div
       style={{
         overflowX: "auto",
@@ -34,8 +33,6 @@ const ChartCard = ({ title, src, height }) => (
         loading="lazy"
       />
     </div>
-
-    {/*mobile hint */}
     <div
       style={{
         fontSize: "0.8rem",
@@ -48,7 +45,64 @@ const ChartCard = ({ title, src, height }) => (
   </div>
 );
 
-const TableCard = ({ title, data }) => {
+const TableCard = ({ title, data, loading, error }) => {
+  if (loading) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          backgroundColor: "#1a1a1a",
+          borderRadius: "12px",
+          padding: "1rem",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          backgroundColor: "#1a1a1a",
+          borderRadius: "12px",
+          padding: "1rem",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
+        <p style={{ color: "#ff6b6b" }}>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          backgroundColor: "#1a1a1a",
+          borderRadius: "12px",
+          padding: "1rem",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
+        <p>No data available</p>
+      </div>
+    );
+  }
+
   const columns = Object.keys(data[0]);
 
   return (
@@ -63,7 +117,6 @@ const TableCard = ({ title, data }) => {
       }}
     >
       <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
-
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -76,7 +129,7 @@ const TableCard = ({ title, data }) => {
                   textAlign: "left",
                 }}
               >
-                {col}
+                {col.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
               </th>
             ))}
           </tr>
@@ -92,7 +145,10 @@ const TableCard = ({ title, data }) => {
                     padding: "0.5rem",
                   }}
                 >
-                  {row[col]}
+                  {typeof row[col] === 'number' && col.includes('profit') 
+                    ? `$${row[col]}` 
+                    : row[col]
+                  }
                 </td>
               ))}
             </tr>
@@ -104,15 +160,35 @@ const TableCard = ({ title, data }) => {
 };
 
 export default function App() {
-  const profitData = [
-    { Name: "Gagan R.", "Total Profit": 61, "Sessions Played": 2 },
-    { Name: "Sean S.", "Total Profit": 68, "Sessions Played": 2 },
-    { Name: "Troy H.", "Total Profit": 80, "Sessions Played": 1 },
-    { Name: "Ethan T.", "Total Profit": -91, "Sessions Played": 2 },
-    { Name: "Avery T.", "Total Profit": -66, "Sessions Played": 2 },
-    { Name: "Ethan L.", "Total Profit": -52, "Sessions Played": 2 },
-  ];
+  const [profitData, setProfitData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchProfitData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('/api/players/profit-summary/all');
+        
+        // Transform the data to match your current table format
+        const formattedData = response.data.map(player => ({
+          Name: player.name,
+          "Total Profit": player.total_profit,
+          "Sessions Played": player.sessions_played
+        }));
+        
+        setProfitData(formattedData);
+        setError(null);
+      } catch (err) {
+        setError(err.response?.data?.error || 'Failed to fetch player data');
+        console.error('Error fetching profit data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfitData();
+  }, []);
 
   return (
     <div
@@ -129,9 +205,12 @@ export default function App() {
     >
       <h1>Bay Area Poker</h1>
 
-
-      {/* Table */}
-      <TableCard title="Player Profits" data={profitData} />
+      <TableCard 
+        title="Player Profits" 
+        data={profitData} 
+        loading={loading} 
+        error={error} 
+      />
 
       <ChartCard
         title="Profit/Loss by Session"
@@ -144,8 +223,6 @@ export default function App() {
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRXIW4YrYvuI9hwOXACI-HPAn_EX0mRKJO3WNHc9y1rCQbzx3PMgObX5lJToojWZ9fdrPKkZxfK-1hb/pubchart?oid=733910113&format=interactive"
         height={600}
       />
-
-
     </div>
   );
 }
