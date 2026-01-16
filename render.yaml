@@ -1,4 +1,5 @@
 services:
+  # Backend service
   - type: web
     name: bayareapoker-backend
     env: node
@@ -9,3 +10,19 @@ services:
         fromDatabase:
           name: your-neon-db
           property: connectionString
+      - key: PORT
+        value: 10000
+
+  # Frontend service
+  - type: web
+    name: bayareapoker-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npx serve -s build -l 3000
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://bayareapoker-backend.onrender.com
+
+databases:
+  - name: your-neon-db
+    plan: free
