@@ -160,21 +160,142 @@ const TableCard = ({ title, data, loading, error }) => {
   );
 };
 
+const SessionNotesCard = ({ sessionNotes, loading, error }) => {
+  if (loading) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          backgroundColor: "#1a1a1a",
+          borderRadius: "12px",
+          padding: "1rem",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          backgroundColor: "#1a1a1a",
+          borderRadius: "12px",
+          padding: "1rem",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
+        <p style={{ color: "#ff6b6b" }}>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!sessionNotes || sessionNotes.length === 0) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+          backgroundColor: "#1a1a1a",
+          borderRadius: "12px",
+          padding: "1rem",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          textAlign: "center",
+        }}
+      >
+        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
+        <p>No session notes available</p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "900px",
+        backgroundColor: "#1a1a1a",
+        borderRadius: "12px",
+        padding: "1rem",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+      }}
+    >
+      <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        {sessionNotes.map((session, index) => {
+          if (!session.notable_hands || session.notable_hands.length === 0) {
+            return null; // Skip sessions without notable hands
+          }
+
+          return (
+            <div
+              key={session.session_id}
+              style={{
+                backgroundColor: "#2a2a2a",
+                borderRadius: "8px",
+                padding: "1rem",
+                border: "1px solid #444",
+              }}
+            >
+              <h3
+                style={{
+                  marginBottom: "0.5rem",
+                  fontSize: "1rem",
+                  color: "#4ade80",
+                }}
+              >
+                Session {session.session_id} - {new Date(session.session_date).toLocaleDateString()}
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {session.notable_hands.map((hand, handIndex) => (
+                  <div
+                    key={hand.id}
+                    style={{
+                      backgroundColor: "#333",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      fontSize: "0.9rem",
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    {hand.note_text}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export default function App() {
   const [profitData, setProfitData] = useState([]);
+  const [sessionNotes, setSessionNotes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notesLoading, setNotesLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notesError, setNotesError] = useState(null);
 
   useEffect(() => {
     const fetchProfitData = async () => {
       try {
         setLoading(true);
-        console.log('API_URL:', API_URL); // Debug log
-        console.log('Fetching from:', `${API_URL}/api/players/profit-summary/all`); // Debug log
+        console.log('API_URL:', API_URL);
+        console.log('Fetching from:', `${API_URL}/api/players/profit-summary/all`);
 
         const response = await axios.get(`${API_URL}/api/players/profit-summary/all`);
 
-        // Transform the data to match your current table format
         const formattedData = response.data.map(player => ({
           Name: player.name,
           "Total Profit": player.total_profit,
@@ -184,14 +305,31 @@ export default function App() {
         setProfitData(formattedData);
         setError(null);
       } catch (err) {
-        console.error('Full error object:', err); // More detailed logging
+        console.error('Full error object:', err);
         setError(err.response?.data?.error || err.message || 'Failed to fetch player data');
       } finally {
         setLoading(false);
       }
     };
 
+    const fetchSessionNotes = async () => {
+      try {
+        setNotesLoading(true);
+        console.log('Fetching session notes from:', `${API_URL}/api/session-notes/all`);
+
+        const response = await axios.get(`${API_URL}/api/session-notes/all`);
+        setSessionNotes(response.data);
+        setNotesError(null);
+      } catch (err) {
+        console.error('Session notes error:', err);
+        setNotesError(err.response?.data?.error || err.message || 'Failed to fetch session notes');
+      } finally {
+        setNotesLoading(false);
+      }
+    };
+
     fetchProfitData();
+    fetchSessionNotes();
   }, []);
 
   return (
@@ -226,6 +364,12 @@ export default function App() {
         title="Session Breakdown"
         src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRXIW4YrYvuI9hwOXACI-HPAn_EX0mRKJO3WNHc9y1rCQbzx3PMgObX5lJToojWZ9fdrPKkZxfK-1hb/pubchart?oid=733910113&format=interactive"
         height={600}
+      />
+
+      <SessionNotesCard
+        sessionNotes={sessionNotes}
+        loading={notesLoading}
+        error={notesError}
       />
     </div>
   );

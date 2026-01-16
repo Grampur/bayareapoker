@@ -6,6 +6,7 @@ require('dotenv').config();
 const playersRouter = require('./routes/players');
 const sessionsRouter = require('./routes/sessions');
 const sessionResultsRouter = require('./routes/sessionResults');
+const sessionNotesRouter = require('./routes/sessionNotes');
 const migrateRoutes = require('./routes/migrate');
 
 const app = express();
@@ -21,32 +22,13 @@ const corsOptions = {
 
 // Middleware
 app.use(cors());
-// const allowedOrigins = new Set([
-//     'http://localhost:3000',
-//     'https://bayareapoker.vercel.app/',
-//     'https://bayareapoker.onrender.com/'
-// ]);
-
-// app.use(cors({
-//   origin: (origin, callback) => {
-//     // allow non-browser requests (curl, Postman)
-//     if (!origin) return callback(null, true);
-
-//     if (allowedOrigins.has(origin)) {
-//       callback(null, origin); // echo origin
-//     } else {
-//       callback(new Error("CORS not allowed"));
-//     }
-//   },
-//   credentials: true,
-// }));
-
 app.use(express.json());
 
 // Routes
 app.use('/api/players', playersRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/session-results', sessionResultsRouter);
+app.use('/api/session-notes', sessionNotesRouter);
 app.use('/api/migrate', migrateRoutes);
 
 // Health check

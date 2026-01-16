@@ -41,6 +41,17 @@ router.get('/', async (req, res) => {
       )
     `);
 
+    // Create session_notes table for notable hands
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS session_notes (
+        id SERIAL PRIMARY KEY,
+        session_id INTEGER NOT NULL,
+        note_text TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+      )
+    `);
+
     res.json({ message: 'Database tables created successfully!' });
   } catch (error) {
     console.error('Migration failed:', error);
