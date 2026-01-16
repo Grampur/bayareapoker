@@ -146,8 +146,8 @@ const TableCard = ({ title, data, loading, error }) => {
                     padding: "0.5rem",
                   }}
                 >
-                  {typeof row[col] === 'number' && col.includes('profit') 
-                    ? `$${row[col]}` 
+                  {typeof row[col] === 'number' && col.includes('profit')
+                    ? `$${row[col]}`
                     : row[col]
                   }
                 </td>
@@ -169,20 +169,23 @@ export default function App() {
     const fetchProfitData = async () => {
       try {
         setLoading(true);
+        console.log('API_URL:', API_URL); // Debug log
+        console.log('Fetching from:', `${API_URL}/api/players/profit-summary/all`); // Debug log
+
         const response = await axios.get(`${API_URL}/api/players/profit-summary/all`);
-        
+
         // Transform the data to match your current table format
         const formattedData = response.data.map(player => ({
           Name: player.name,
           "Total Profit": player.total_profit,
           "Sessions Played": player.sessions_played
         }));
-        
+
         setProfitData(formattedData);
         setError(null);
       } catch (err) {
-        setError(err.response?.data?.error || 'Failed to fetch player data');
-        console.error('Error fetching profit data:', err);
+        console.error('Full error object:', err); // More detailed logging
+        setError(err.response?.data?.error || err.message || 'Failed to fetch player data');
       } finally {
         setLoading(false);
       }
@@ -206,11 +209,11 @@ export default function App() {
     >
       <h1>Bay Area Poker</h1>
 
-      <TableCard 
-        title="Player Profits" 
-        data={profitData} 
-        loading={loading} 
-        error={error} 
+      <TableCard
+        title="Player Profits"
+        data={profitData}
+        loading={loading}
+        error={error}
       />
 
       <ChartCard

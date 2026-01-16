@@ -11,8 +11,19 @@ const migrateRoutes = require('./routes/migrate');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Improved CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'https://bayareapoker-frontend.onrender.com',
+    'https://bayareapoker-frontend.onrender.com/'
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
