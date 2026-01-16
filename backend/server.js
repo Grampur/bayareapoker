@@ -20,7 +20,7 @@ const corsOptions = {
 };
 
 // Middleware
-app.use(cors(corsOptions));
+app.use(cors());
 // const allowedOrigins = new Set([
 //     'http://localhost:3000',
 //     'https://bayareapoker.vercel.app/',
