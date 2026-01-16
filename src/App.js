@@ -292,11 +292,11 @@ export default function App() {
       try {
         setLoading(true);
         console.log('API_URL:', API_URL);
-        console.log('Fetching from:', `${API_URL}/api/players/profit-summary/all`);
+        console.log('Fetching from:', `${API_URL}/api/cached/profit-summary`);
 
-        const response = await axios.get(`${API_URL}/api/players/profit-summary/all`);
+        const response = await axios.get(`${API_URL}/api/cached/profit-summary`);
 
-        const formattedData = response.data.map(player => ({
+        const formattedData = response.data.data.map(player => ({
           Name: player.name,
           "Total Profit": player.total_profit,
           "Sessions Played": player.sessions_played
@@ -304,6 +304,9 @@ export default function App() {
 
         setProfitData(formattedData);
         setError(null);
+
+        // Show last updated time
+        console.log('Data last updated:', response.data.lastUpdated);
       } catch (err) {
         console.error('Full error object:', err);
         setError(err.response?.data?.error || err.message || 'Failed to fetch player data');
@@ -315,11 +318,14 @@ export default function App() {
     const fetchSessionNotes = async () => {
       try {
         setNotesLoading(true);
-        console.log('Fetching session notes from:', `${API_URL}/api/session-notes/all`);
+        console.log('Fetching session notes from:', `${API_URL}/api/cached/session-notes`);
 
-        const response = await axios.get(`${API_URL}/api/session-notes/all`);
-        setSessionNotes(response.data);
+        const response = await axios.get(`${API_URL}/api/cached/session-notes`);
+        setSessionNotes(response.data.data);
         setNotesError(null);
+
+        // Show last updated time
+        console.log('Session notes last updated:', response.data.lastUpdated);
       } catch (err) {
         console.error('Session notes error:', err);
         setNotesError(err.response?.data?.error || err.message || 'Failed to fetch session notes');
