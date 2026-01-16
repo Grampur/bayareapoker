@@ -11,38 +11,35 @@ const migrateRoutes = require('./routes/migrate');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Improved CORS configuration
-// const corsOptions = {
-//   origin: [
+const corsOptions = {
+  origin: [
+    'https://bayareapoker.vercel.app/',
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+// Middleware
+app.use(cors(corsOptions));
+// const allowedOrigins = new Set([
 //     'http://localhost:3000',
 //     'https://bayareapoker.vercel.app/',
 //     'https://bayareapoker.onrender.com/'
-//   ],
+// ]);
+
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     // allow non-browser requests (curl, Postman)
+//     if (!origin) return callback(null, true);
+
+//     if (allowedOrigins.has(origin)) {
+//       callback(null, origin); // echo origin
+//     } else {
+//       callback(new Error("CORS not allowed"));
+//     }
+//   },
 //   credentials: true,
-//   optionsSuccessStatus: 200
-// };
-
-// Middleware
-// app.use(cors(corsOptions));
-const allowedOrigins = new Set([
-    'http://localhost:3000',
-    'https://bayareapoker.vercel.app/',
-    'https://bayareapoker.onrender.com/'
-]);
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // allow non-browser requests (curl, Postman)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.has(origin)) {
-      callback(null, origin); // echo origin
-    } else {
-      callback(new Error("CORS not allowed"));
-    }
-  },
-  credentials: true,
-}));
+// }));
 
 app.use(express.json());
 
