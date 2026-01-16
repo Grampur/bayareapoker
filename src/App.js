@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 const ChartCard = ({ title, src, height }) => (
   <div
@@ -168,7 +169,7 @@ export default function App() {
     const fetchProfitData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/api/players/profit-summary/all');
+        const response = await axios.get(`${API_URL}/api/players/profit-summary/all`);
         
         // Transform the data to match your current table format
         const formattedData = response.data.map(player => ({

@@ -6,6 +6,7 @@ require('dotenv').config();
 const playersRouter = require('./routes/players');
 const sessionsRouter = require('./routes/sessions');
 const sessionResultsRouter = require('./routes/sessionResults');
+const migrateRoutes = require('./routes/migrate');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/api/players', playersRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/session-results', sessionResultsRouter);
+app.use('/api/migrate', migrateRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

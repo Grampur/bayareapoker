@@ -31,11 +31,6 @@ pids/
 coverage/
 *.lcov
 
-# Database files (if you have local SQLite files)
-*.db
-*.sqlite
-*.sqlite3
-
 # IDE and editor files
 .vscode/
 .idea/

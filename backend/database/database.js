@@ -1,55 +1,58 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-
-const dbPath = path.join(__dirname, 'bayareapoker.db');
+const { Pool } = require('pg');
+require('dotenv').config();
 
 class Database {
     constructor() {
-        this.db = new sqlite3.Database(dbPath, (err) => {
+        this.pool = new Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+                rejectUnauthorized: false
+            }
+        });
+
+        // Test the connection
+        this.pool.connect((err, client, release) => {
             if (err) {
-                console.error('Error opening database:', err);
+                console.error('Error connecting to database:', err);
             } else {
-                console.log('Connected to SQLite database');
+                console.log('Connected to PostgreSQL database');
+                release();
             }
         });
     }
 
     // Generic query method
-    query(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.all(sql, params, (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
-            });
-        });
+    async query(sql, params = []) {
+        const client = await this.pool.connect();
+        try {
+            const result = await client.query(sql, params);
+            return result.rows;
+        } catch (error) {
+            throw error;
+        } finally {
+            client.release();
+        }
     }
 
     // Generic run method for INSERT, UPDATE, DELETE
-    run(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.run(sql, params, function (err) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ id: this.lastID, changes: this.changes });
-                }
-            });
-        });
+    async run(sql, params = []) {
+        const client = await this.pool.connect();
+        try {
+            const result = await client.query(sql, params);
+            return {
+                id: result.rows[0]?.id,
+                rowCount: result.rowCount,
+                rows: result.rows
+            };
+        } catch (error) {
+            throw error;
+        } finally {
+            client.release();
+        }
     }
 
-    close() {
-        return new Promise((resolve, reject) => {
-            this.db.close((err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-        });
+    async close() {
+        await this.pool.end();
     }
 }
 
