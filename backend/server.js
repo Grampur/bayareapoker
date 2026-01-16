@@ -16,7 +16,7 @@ const corsOptions = {
   origin: [
     'http://localhost:3000',
     'https://bayareapoker.vercel.app/',
-    'https://bayareapoker-frontend.onrender.com/'
+    'https://bayareapoker.onrender.com/'
   ],
   credentials: true,
   optionsSuccessStatus: 200
