@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3001;
 const corsOptions = {
   origin: [
     'http://localhost:3000',
-    'https://bayareapoker-frontend.onrender.com',
+    'https://bayareapoker.vercel.app/',
     'https://bayareapoker-frontend.onrender.com/'
   ],
   credentials: true,
