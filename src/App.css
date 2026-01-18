@@ -86,8 +86,8 @@
 /* Mobile chart adjustments */
 @media (max-width: 767px) {
     .chart-iframe {
-        width: 320px;
-        /* Optimized for mobile viewing */
+        width: calc(100vw - 3rem);
+        min-width: 350px;
     }
 }
 
