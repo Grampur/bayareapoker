@@ -22,6 +22,150 @@ const ChartCard = ({ title, src, height }) => (
   </div>
 );
 
+const SortableTableCard = ({ title, data, loading, error }) => {
+  const [sortField, setSortField] = useState("Total Profit");
+  const [sortDirection, setSortDirection] = useState("desc"); // Start with biggest profit (desc)
+
+  if (loading) {
+    return (
+      <div className="card card-centered">
+        <h2 className="card-title">{title}</h2>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="card card-centered">
+        <h2 className="card-title">{title}</h2>
+        <p className="card-error">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="card card-centered">
+        <h2 className="card-title">{title}</h2>
+        <p>No data available</p>
+      </div>
+    );
+  }
+
+  const columns = Object.keys(data[0]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      // If clicking the same field, toggle direction
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // If clicking a new field, set default direction based on field type
+      setSortField(field);
+      if (field === "Name") {
+        setSortDirection("asc"); // Names default to A-Z
+      } else {
+        setSortDirection("desc"); // Numbers default to high-to-low
+      }
+    }
+  };
+
+  const getSortedData = () => {
+    return [...data].sort((a, b) => {
+      let aVal = a[sortField];
+      let bVal = b[sortField];
+
+      // Handle string sorting (names)
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+        if (sortDirection === "asc") {
+          return aVal.localeCompare(bVal);
+        } else {
+          return bVal.localeCompare(aVal);
+        }
+      }
+
+      // Handle number sorting (profit, sessions)
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        if (sortDirection === "asc") {
+          return aVal - bVal;
+        } else {
+          return bVal - aVal;
+        }
+      }
+
+      return 0;
+    });
+  };
+
+  const getSortIcon = (field) => {
+    if (sortField !== field) return "⇅";
+    return sortDirection === "asc" ? "↑" : "↓";
+  };
+
+  const getFieldDisplayName = (field) => {
+    const displayNames = {
+      "Name": "Name",
+      "Total Profit": "Profit/Loss",
+      "Sessions Played": "Sessions"
+    };
+    return displayNames[field] || field.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
+
+  const sortedData = getSortedData();
+
+  return (
+    <div className="card">
+      <h2 className="card-title">{title}</h2>
+      
+      {/* Sort Controls */}
+      <div className="sort-controls">
+        <span className="sort-label">Sort by:</span>
+        {columns.map((field) => (
+          <button
+            key={field}
+            onClick={() => handleSort(field)}
+            className={`sort-button ${sortField === field ? "sort-button-active" : ""}`}
+          >
+            {getFieldDisplayName(field)} {getSortIcon(field)}
+          </button>
+        ))}
+      </div>
+
+      <table className="table">
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th 
+                key={col} 
+                className={`table-header table-header-sortable ${sortField === col ? "table-header-active" : ""}`}
+                onClick={() => handleSort(col)}
+              >
+                {getFieldDisplayName(col)} {getSortIcon(col)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {sortedData.map((row, i) => (
+            <tr key={i}>
+              {columns.map((col) => (
+                <td key={col} className="table-cell">
+                  {typeof row[col] === 'number' && col.includes('Profit')
+                    ? `$${row[col]}`
+                    : row[col]
+                  }
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 const TableCard = ({ title, data, loading, error }) => {
   if (loading) {
     return (
@@ -202,7 +346,8 @@ export default function App() {
     <div className="app-container">
       <h1 className="app-title">Bay Area Poker</h1>
 
-      <TableCard
+      {/* Changed from TableCard to SortableTableCard */}
+      <SortableTableCard
         title="Player Profits"
         data={profitData}
         loading={loading}
