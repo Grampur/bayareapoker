@@ -215,7 +215,6 @@
     }
 }
 
-/* Sort Controls */
 .sort-controls {
     display: flex;
     flex-wrap: wrap;
@@ -224,11 +223,8 @@
     margin-bottom: 1rem;
     padding: 0.875rem;
     background-color: #2a2a2a;
-    /* Matching session-note background */
     border-radius: 8px;
-    /* Matching other elements */
     border: 1px solid #444;
-    /* Matching session-note border */
 }
 
 @media (min-width: 768px) {
@@ -240,7 +236,6 @@
 .sort-label {
     font-weight: 600;
     color: white;
-    /* White text to match the theme */
     margin-right: 0.5rem;
     font-size: 0.9rem;
 }
@@ -254,19 +249,14 @@
 .sort-button {
     padding: 0.375rem 0.75rem;
     background-color: #333;
-    /* Dark background matching notable-hand */
     border: 1px solid #555;
-    /* Subtle border matching table cell borders */
     border-radius: 6px;
-    /* Matching notable-hand border radius */
     cursor: pointer;
     font-size: 0.8rem;
     color: white;
-    /* White text */
     transition: all 0.15s ease-in-out;
     white-space: nowrap;
     min-height: 36px;
-    /* Ensuring good touch target */
 }
 
 @media (min-width: 768px) {
@@ -278,27 +268,21 @@
 
 .sort-button:hover {
     background-color: #444;
-    /* Slightly lighter on hover */
     border-color: #666;
 }
 
 .sort-button-active {
     background-color: #4ade80;
-    /* Green accent matching session-note-title */
     color: #111;
-    /* Dark text for contrast on green background */
     border-color: #4ade80;
     font-weight: 600;
-    /* Slightly bold when active */
 }
 
 .sort-button-active:hover {
     background-color: #22c55e;
-    /* Slightly darker green on hover */
     border-color: #22c55e;
 }
 
-/* Sortable Table Headers - matching the dark theme */
 .table-header-sortable {
     cursor: pointer;
     user-select: none;
@@ -308,15 +292,13 @@
 
 .table-header-sortable:hover {
     background-color: #2a2a2a;
-    /* Subtle hover effect */
     color: #4ade80;
-    /* Green text on hover */
 }
 
 .table-header-active {
     background-color: #2a2a2a;
     color: #4ade80;
-    /* Green text when active */
+    
     font-weight: 600;
 }
 
@@ -338,11 +320,9 @@
         min-width: 0;
         text-align: center;
         min-height: 44px;
-        /* Better touch target for mobile */
     }
 }
 
-/* Touch-friendly improvements for sort controls */
 @media (hover: none) and (pointer: coarse) {
     .sort-button {
         min-height: 44px;
