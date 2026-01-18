@@ -1,46 +1,22 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import './App.css';
+
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 const ChartCard = ({ title, src, height }) => (
-  <div
-    style={{
-      width: "100%",
-      maxWidth: "900px",
-      backgroundColor: "#1a1a1a",
-      borderRadius: "12px",
-      padding: "1rem",
-      boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-    }}
-  >
-    <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
-    <div
-      style={{
-        overflowX: "auto",
-        WebkitOverflowScrolling: "touch",
-      }}
-    >
+  <div className="card">
+    <h2 className="card-title">{title}</h2>
+    <div className="chart-container">
       <iframe
         src={src}
         title={title}
-        style={{
-          width: "900px",
-          height: height,
-          border: "none",
-          background: "white",
-          borderRadius: "8px",
-          display: "block",
-        }}
+        className="chart-iframe"
+        style={{ '--chart-height': height + 'px' }}
         loading="lazy"
       />
     </div>
-    <div
-      style={{
-        fontSize: "0.8rem",
-        opacity: 0.6,
-        marginTop: "0.5rem",
-      }}
-    >
+    <div className="chart-hint">
       Swipe left/right to view chart →
     </div>
   </div>
@@ -49,18 +25,8 @@ const ChartCard = ({ title, src, height }) => (
 const TableCard = ({ title, data, loading, error }) => {
   if (loading) {
     return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          backgroundColor: "#1a1a1a",
-          borderRadius: "12px",
-          padding: "1rem",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
+      <div className="card card-centered">
+        <h2 className="card-title">{title}</h2>
         <p>Loading...</p>
       </div>
     );
@@ -68,37 +34,17 @@ const TableCard = ({ title, data, loading, error }) => {
 
   if (error) {
     return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          backgroundColor: "#1a1a1a",
-          borderRadius: "12px",
-          padding: "1rem",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
-        <p style={{ color: "#ff6b6b" }}>Error: {error}</p>
+      <div className="card card-centered">
+        <h2 className="card-title">{title}</h2>
+        <p className="card-error">Error: {error}</p>
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          backgroundColor: "#1a1a1a",
-          borderRadius: "12px",
-          padding: "1rem",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
+      <div className="card card-centered">
+        <h2 className="card-title">{title}</h2>
         <p>No data available</p>
       </div>
     );
@@ -107,29 +53,13 @@ const TableCard = ({ title, data, loading, error }) => {
   const columns = Object.keys(data[0]);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "900px",
-        backgroundColor: "#1a1a1a",
-        borderRadius: "12px",
-        padding: "1rem",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-      }}
-    >
-      <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>{title}</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <div className="card">
+      <h2 className="card-title">{title}</h2>
+      <table className="table">
         <thead>
           <tr>
             {columns.map((col) => (
-              <th
-                key={col}
-                style={{
-                  borderBottom: "2px solid white",
-                  padding: "0.5rem",
-                  textAlign: "left",
-                }}
-              >
+              <th key={col} className="table-header">
                 {col.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
               </th>
             ))}
@@ -139,13 +69,7 @@ const TableCard = ({ title, data, loading, error }) => {
           {data.map((row, i) => (
             <tr key={i}>
               {columns.map((col) => (
-                <td
-                  key={col}
-                  style={{
-                    borderBottom: "1px solid #555",
-                    padding: "0.5rem",
-                  }}
-                >
+                <td key={col} className="table-cell">
                   {typeof row[col] === 'number' && col.includes('profit')
                     ? `$${row[col]}`
                     : row[col]
@@ -163,18 +87,8 @@ const TableCard = ({ title, data, loading, error }) => {
 const SessionNotesCard = ({ sessionNotes, loading, error }) => {
   if (loading) {
     return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          backgroundColor: "#1a1a1a",
-          borderRadius: "12px",
-          padding: "1rem",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
+      <div className="card card-centered">
+        <h2 className="card-title">Session Notes</h2>
         <p>Loading...</p>
       </div>
     );
@@ -182,91 +96,39 @@ const SessionNotesCard = ({ sessionNotes, loading, error }) => {
 
   if (error) {
     return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          backgroundColor: "#1a1a1a",
-          borderRadius: "12px",
-          padding: "1rem",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
-        <p style={{ color: "#ff6b6b" }}>Error: {error}</p>
+      <div className="card card-centered">
+        <h2 className="card-title">Session Notes</h2>
+        <p className="card-error">Error: {error}</p>
       </div>
     );
   }
 
   if (!sessionNotes || sessionNotes.length === 0) {
     return (
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          backgroundColor: "#1a1a1a",
-          borderRadius: "12px",
-          padding: "1rem",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
+      <div className="card card-centered">
+        <h2 className="card-title">Session Notes</h2>
         <p>No session notes available</p>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "900px",
-        backgroundColor: "#1a1a1a",
-        borderRadius: "12px",
-        padding: "1rem",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-      }}
-    >
-      <h2 style={{ marginBottom: "0.75rem", fontSize: "1.1rem" }}>Session Notes</h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <div className="card">
+      <h2 className="card-title">Session Notes</h2>
+      <div className="session-notes-container">
         {sessionNotes.map((session, index) => {
           if (!session.notable_hands || session.notable_hands.length === 0) {
-            return null; // Skip sessions without notable hands
+            return null;
           }
 
           return (
-            <div
-              key={session.session_id}
-              style={{
-                backgroundColor: "#2a2a2a",
-                borderRadius: "8px",
-                padding: "1rem",
-                border: "1px solid #444",
-              }}
-            >
-              <h3
-                style={{
-                  marginBottom: "0.5rem",
-                  fontSize: "1rem",
-                  color: "#4ade80",
-                }}
-              >
+            <div key={session.session_id} className="session-note">
+              <h3 className="session-note-title">
                 Session {session.session_id} - {new Date(session.session_date).toLocaleDateString()}
               </h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div className="session-note-hands">
                 {session.notable_hands.map((hand, handIndex) => (
-                  <div
-                    key={hand.id}
-                    style={{
-                      backgroundColor: "#333",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      fontSize: "0.9rem",
-                      lineHeight: "1.4",
-                    }}
-                  >
+                  <div key={hand.id} className="notable-hand">
                     {hand.note_text}
                   </div>
                 ))}
@@ -305,7 +167,6 @@ export default function App() {
         setProfitData(formattedData);
         setError(null);
 
-        // Show last updated time
         console.log('Data last updated:', response.data.lastUpdated);
       } catch (err) {
         console.error('Full error object:', err);
@@ -324,7 +185,6 @@ export default function App() {
         setSessionNotes(response.data.data);
         setNotesError(null);
 
-        // Show last updated time
         console.log('Session notes last updated:', response.data.lastUpdated);
       } catch (err) {
         console.error('Session notes error:', err);
@@ -339,19 +199,8 @@ export default function App() {
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#111",
-        color: "white",
-        padding: "2rem",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "2rem",
-      }}
-    >
-      <h1>Bay Area Poker</h1>
+    <div className="app-container">
+      <h1 className="app-title">Bay Area Poker</h1>
 
       <TableCard
         title="Player Profits"
