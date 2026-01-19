@@ -67,10 +67,13 @@ async function refreshCache() {
 }
 refreshCache();
 
-cron.schedule('0 8 * * *', () => {
-  console.log('Running scheduled cache refresh at midnight PST');
+function invalidateCache() {
+  console.log('Cache invalidated, refreshing...', new Date().toISOString());
   refreshCache();
-});
+}
+
+refreshCache();
+app.set('invalidateCache', invalidateCache);
 
 // Middleware
 app.use(cors());

@@ -15,7 +15,7 @@ router.get('/session/:sessionId', async (req, res) => {
       WHERE sn.session_id = $1
       ORDER BY sn.created_at ASC
     `, [req.params.sessionId]);
-    
+
     res.json(notes);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -42,7 +42,7 @@ router.get('/all', async (req, res) => {
       GROUP BY s.id, s.date, s.notes
       ORDER BY s.date DESC
     `);
-    
+
     res.json(notes);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -53,16 +53,18 @@ router.get('/all', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { session_id, note_text } = req.body;
-    
+
     if (!session_id || !note_text) {
       return res.status(400).json({ error: 'Session ID and note text are required' });
     }
-    
+
     const result = await db.run(
       'INSERT INTO session_notes (session_id, note_text) VALUES ($1, $2) RETURNING *',
       [session_id, note_text]
     );
-    
+
+    req.app.get('invalidateCache')();
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -73,20 +75,22 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { note_text } = req.body;
-    
+
     if (!note_text) {
       return res.status(400).json({ error: 'Note text is required' });
     }
-    
+
     const result = await db.run(
       'UPDATE session_notes SET note_text = $1 WHERE id = $2 RETURNING *',
       [note_text, req.params.id]
     );
-    
+
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Session note not found' });
     }
-    
+
+    req.app.get('invalidateCache')();
+
     res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -100,11 +104,13 @@ router.delete('/:id', async (req, res) => {
       'DELETE FROM session_notes WHERE id = $1',
       [req.params.id]
     );
-    
+
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Session note not found' });
     }
-    
+
+    req.app.get('invalidateCache')();
+
     res.json({ message: 'Session note deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });

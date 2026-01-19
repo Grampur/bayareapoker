@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
       GROUP BY s.id
       ORDER BY s.date DESC
     `);
-    
+
     res.json(sessions);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -30,11 +30,11 @@ router.get('/:id', async (req, res) => {
       'SELECT * FROM sessions WHERE id = ?',
       [req.params.id]
     );
-    
+
     if (session.length === 0) {
       return res.status(404).json({ error: 'Session not found' });
     }
-    
+
     const results = await db.query(`
       SELECT 
         sr.*,
@@ -44,7 +44,7 @@ router.get('/:id', async (req, res) => {
       WHERE sr.session_id = ?
       ORDER BY sr.profit DESC
     `, [req.params.id]);
-    
+
     res.json({
       ...session[0],
       results: results
@@ -58,21 +58,23 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { date, notes } = req.body;
-    
+
     if (!date) {
       return res.status(400).json({ error: 'Date is required' });
     }
-    
+
     const result = await db.run(
       'INSERT INTO sessions (date, notes) VALUES (?, ?)',
       [date, notes || null]
     );
-    
+
     const newSession = await db.query(
       'SELECT * FROM sessions WHERE id = ?',
       [result.id]
     );
-    
+
+    req.app.get('invalidateCache')();
+
     res.status(201).json(newSession[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -83,25 +85,27 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { date, notes } = req.body;
-    
+
     if (!date) {
       return res.status(400).json({ error: 'Date is required' });
     }
-    
+
     await db.run(
       'UPDATE sessions SET date = ?, notes = ? WHERE id = ?',
       [date, notes || null, req.params.id]
     );
-    
+
     const updatedSession = await db.query(
       'SELECT * FROM sessions WHERE id = ?',
       [req.params.id]
     );
-    
+
     if (updatedSession.length === 0) {
       return res.status(404).json({ error: 'Session not found' });
     }
-    
+
+    req.app.get('invalidateCache')();
+
     res.json(updatedSession[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
